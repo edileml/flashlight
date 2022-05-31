@@ -1,12 +1,35 @@
-import React from 'react';
-import {View, StyleSheet, Image} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import Torch from 'react-native-torch';
+import RNSnake from 'react-native-shake';
 import imagex from './assets/icons/eco-light-off.png';
 
 const App = () => {
-const toggle = true; //false
+const [toggle, setToggle] = useState(false); 
+
+const handleChangeToggle = () => setToggle(oldToggle => !oldToggle)
+
+useEffect(()=> {
+  //liga o flash do celular
+Torch.switchState (toggle);
+},[toggle]);
+
+useEffect(() =>{
+  const subscription = RNSnake.addListener(() => {
+  setToggle(oldToggle => !oldToggle)
+  });
+  // essa funcao vai ser chamada quando o componente
+  //for ser desmontado
+  return () => subscription.remove();
+
+})
+
+
 
  return ( 
  <View style={toggle ? style.containerLight : style.container}>
+<TouchableOpacity onPress={handleChangeToggle} >
+
 <Image 
 style={toggle ? style.lightingOn : style.lightingOff} 
 source={
@@ -14,8 +37,16 @@ source={
   ? require('./assets/icons/eco-light.png')
   : require('./assets/icons/eco-light-off.png')
   } 
-  
   />
+  <Image 
+  style={style.dioLogo}
+  source={
+    toggle
+    ? require('./assets/icons/logo-dio.png')
+    : require('./assets/icons/logo-dio-white.png')
+  }
+  />
+  </TouchableOpacity>
   </View>
 );
 };
@@ -50,3 +81,10 @@ const style = StyleSheet.create({
     width: 150,
     height: 150,
   },
+  dioLogo: {
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    width: 250,
+    height: 250,
+  },
+});
